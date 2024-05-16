@@ -1,0 +1,7 @@
+flask==3.0.2
+requests
+redis==5.0.1
+uuid
+hotqueue==0.2.8
+pytest
+matplotlib

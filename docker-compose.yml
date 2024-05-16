@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+    redis-db:
+        image: redis:7
+        volumes:
+            - ./data:/data
+        ports:
+            - 6379:6379
+        user: "1000:1000"
+        command: ["--save", "60", "10"]
+    flask-api:
+        image: username/flask_app:1.0
+        build:
+            context: ./
+            dockerfile: ./Dockerfile
+        ports:
+            - 5000:5000
+        depends_on:
+            - redis-db
+        command: ["python3", "src/api.py"]
+        environment:
+            - REDIS_HOST=redis-db
+            - REDIS_PORT=6379
+            - LOG_LEVEL=DEBUG
+    worker:
+        image: username/worker:1.0
+        build:
+            context: ./
+            dockerfile: ./Dockerfile
+        depends_on:
+            - redis-db
+        command: ["python3", "src/worker.py"]
+        environment:
+            - REDIS_HOST=redis-db
+            - REDIS_PORT=6379
+            - LOG_LEVEL=WARNING
